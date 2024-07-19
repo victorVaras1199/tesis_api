@@ -29,6 +29,10 @@ class RequestBody(Enum):
 	"""
 	FILE = "file"
 
+@app.route("/")
+def index():
+	return render_template("index.html")
+
 @app.route("/estimate-pose", methods=[HttpMethods.POST.value])
 def estimate_pose():
 	"""
