@@ -3,9 +3,10 @@ import cv2
 import numpy as np
 import mediapipe as mp
 
+from enum import Enum
 from flask import Flask, request, send_file
-from werkzeug.utils import secure_filename
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app)
