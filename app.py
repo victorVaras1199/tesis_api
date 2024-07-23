@@ -1,33 +1,18 @@
 import io
-import cv2
-import numpy as np
-import mediapipe as mp
 
-from enum import Enum
+import cv2
+import mediapipe as mp
+import numpy as np
 from flask import Flask, request, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
+from enums.http_methods import HttpMethods
+from enums.request_body import RequestBody
+from utils.process_landmarks import process_landmarks
+
 app = Flask(__name__)
 CORS(app)
-
-class HttpMethods(Enum):
-	"""
-	Enumeration for HTTP methods.
-
-	Attributes:
-		POST: Represents the HTTP POST method.
-	"""
-	POST = "POST"
-
-class RequestBody(Enum):
-	"""
-	Enumeration for request body fields.
-
-	Attributes:
-		FILE: Represents the 'file' field in a request body.
-	"""
-	FILE = "file"
 
 @app.route("/estimate-pose", methods=[HttpMethods.POST.value])
 def estimate_pose():
@@ -66,6 +51,19 @@ def estimate_pose():
 
 		if results.pose_landmarks is not None:
 			mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+
+			landmarks = results.pose_landmarks.landmark
+
+			coords_and_angles = process_landmarks(landmarks, mp_pose, image)
+
+			cv2.putText(image, str(int(coords_and_angles["shoulder"]["right"]["angle"])), coords_and_angles["shoulder"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["shoulder"]["left"]["angle"])), coords_and_angles["shoulder"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+
+			cv2.putText(image, str(int(coords_and_angles["elbow"]["right"]["angle"])), coords_and_angles["elbow"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["elbow"]["left"]["angle"])), coords_and_angles["elbow"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+
+			cv2.putText(image, str(int(coords_and_angles["wrist"]["right"]["angle"])), coords_and_angles["wrist"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["wrist"]["left"]["angle"])), coords_and_angles["wrist"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
 
 	_, processed_image = cv2.imencode('.jpg', image)
 	processed_image_in_memory = io.BytesIO(processed_image.tobytes())
