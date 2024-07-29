@@ -28,44 +28,17 @@ def process_landmarks(landmarks, mp_pose, image):
 	right_wrist_angle = calculate_angle(right_pinky, right_wrist, right_elbow)
 	left_wrist_angle = calculate_angle(left_elbow, left_wrist, left_pinky)
 
-	left_elbow_coords = tuple(np.multiply(left_elbow, [image.shape[1], image.shape[0]]).astype(int))
-	right_elbow_coords = tuple(np.multiply(right_elbow, [image.shape[1], image.shape[0]]).astype(int))
-
-	left_shoulder_coords = tuple(np.multiply(left_shoulder, [image.shape[1], image.shape[0]]).astype(int))
-	right_shoulder_coords = tuple(np.multiply(right_shoulder, [image.shape[1], image.shape[0]]).astype(int))
-
-	left_wrist_coords = tuple(np.multiply(left_wrist, [image.shape[1], image.shape[0]]).astype(int))
-	right_wrist_coords = tuple(np.multiply(right_wrist, [image.shape[1], image.shape[0]]).astype(int))
-
 	return {
 		"elbow": {
-			"right": {
-				"angle": right_elbow_angle,
-				"coords": right_elbow_coords
-			},
-			"left": {
-				"angle": left_elbow_angle,
-				"coords": left_elbow_coords
-			}
+			"right": int(right_elbow_angle),
+			"left": int(left_elbow_angle)
 		},
 		"shoulder": {
-			"right": {
-				"angle": right_shoulder_angle,
-				"coords": right_shoulder_coords
-			},
-			"left": {
-				"angle": left_shoulder_angle,
-				"coords": left_shoulder_coords
-			}
+			"right": int(right_shoulder_angle),
+			"left": int(left_shoulder_angle)
 		},
 		"wrist": {
-			"right": {
-				"angle": right_wrist_angle,
-				"coords": right_wrist_coords
-			},
-			"left": {
-				"angle": left_wrist_angle,
-				"coords": left_wrist_coords
-			}
+			"right": int(right_wrist_angle),
+			"left": int(left_wrist_angle)
 		}
 	}

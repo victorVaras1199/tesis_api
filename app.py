@@ -1,9 +1,13 @@
 import io
 
+import base64
 import cv2
+import json
 import mediapipe as mp
 import numpy as np
-from flask import Flask, request, send_file
+
+# from flask import Flask, request, send_file
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
@@ -45,6 +49,7 @@ def estimate_pose():
 	file_bytes = np.frombuffer(file_in_memory.read(), np.uint8)
 	image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
+	response = {}
 	with mp_pose.Pose(static_image_mode=True) as pose:
 		image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 		results = pose.process(image_rgb)
@@ -56,19 +61,32 @@ def estimate_pose():
 
 			coords_and_angles = process_landmarks(landmarks, mp_pose, image)
 
-			cv2.putText(image, str(int(coords_and_angles["shoulder"]["right"]["angle"])), coords_and_angles["shoulder"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-			cv2.putText(image, str(int(coords_and_angles["shoulder"]["left"]["angle"])), coords_and_angles["shoulder"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			# cv2.putText(image, str(int(coords_and_angles["shoulder"]["right"]["angle"])), coords_and_angles["shoulder"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			# cv2.putText(image, str(int(coords_and_angles["shoulder"]["left"]["angle"])), coords_and_angles["shoulder"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
 
-			cv2.putText(image, str(int(coords_and_angles["elbow"]["right"]["angle"])), coords_and_angles["elbow"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-			cv2.putText(image, str(int(coords_and_angles["elbow"]["left"]["angle"])), coords_and_angles["elbow"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			# cv2.putText(image, str(int(coords_and_angles["elbow"]["right"]["angle"])), coords_and_angles["elbow"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			# cv2.putText(image, str(int(coords_and_angles["elbow"]["left"]["angle"])), coords_and_angles["elbow"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
 
-			cv2.putText(image, str(int(coords_and_angles["wrist"]["right"]["angle"])), coords_and_angles["wrist"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-			cv2.putText(image, str(int(coords_and_angles["wrist"]["left"]["angle"])), coords_and_angles["wrist"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			# cv2.putText(image, str(int(coords_and_angles["wrist"]["right"]["angle"])), coords_and_angles["wrist"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			# cv2.putText(image, str(int(coords_and_angles["wrist"]["left"]["angle"])), coords_and_angles["wrist"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+
+			# response['landmarks'] = coords_and_angles
 
 	_, processed_image = cv2.imencode('.jpg', image)
 	processed_image_in_memory = io.BytesIO(processed_image.tobytes())
 
-	return send_file(processed_image_in_memory, mimetype="image/jpeg", as_attachment=True, download_name=secure_filename(file.filename))
+	# return send_file(processed_image_in_memory, mimetype="image/jpeg", as_attachment=True, download_name=secure_filename(file.filename))
+
+	processed_image_base64 = base64.b64encode(processed_image_in_memory.getvalue()).decode('utf-8')
+
+	# response['image'] = processed_image_base64
+
+	response = {
+		"angles": coords_and_angles,
+		"image": processed_image_base64
+	}
+
+	return jsonify(response)
 
 if __name__ == "__main__":
 	app.run(debug=True)

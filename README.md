@@ -10,7 +10,6 @@ This project is a Flask-based web API for pose estimation using MediaPipe and Op
 	- [Requirements](#requirements)
 	- [Installation](#installation)
 	- [Usage](#usage)
-		- [Example](#example)
 
 ## Introduction
 
@@ -29,50 +28,40 @@ The Flask Pose Estimation API allows you to upload an image, processes it to det
 
 1. Clone the repository:
 
- ```sh
- git clone https://github.com/joshcast777/pose-estimation-api.git
+```sh
+git clone https://github.com/joshcast777/pose-estimation-api.git
+```
 
- cd flask-pose-estimation-api
- ```
+2. Navigate to the project directory:
 
-2. Create and activate a virtual environment:
+```bash
+cd flask-pose-estimation-api
+```
 
- ```sh
- python3 -m venv venv
+3. Create and activate a virtual environment:
 
- # For Windows
- venv\Scripts\activate
+```sh
+python3 -m venv venv
 
- # For Linux and macOS
- source venv/bin/activate
- ```
+# For Windows
+venv\Scripts\activate
 
-3. Install the required packages:
+# For Linux and macOS
+source venv/bin/activate
+```
 
- ```sh
- pip install -r requirements.txt
- ```
+4. Install the required packages:
+
+```sh
+pip install -r requirements.txt
+```
 
 ## Usage
 
 1. Start the Flask server:
 
- ```sh
- python app.py
- ```
-
-2. Send a POST request to the `/estimate-pose` endpoint with an image file:
-
- ```sh
- curl -X POST -F "file=@path_to_your_image.jpg" http://127.0.0.1:5000/estimate-pose --output output.jpg
- ```
-
-3. The server will process the image and return it with the pose landmarks drawn.
-
-### Example
-
-Here's an example of how to send a request using `curl`:
-
 ```sh
-curl -X POST -F "file=@/path/to/your/image.jpg" http://127.0.0.1:5000/estimate-pose --output output.jpg
+python app.py
 ```
+
+1. Use any client to test endpoints, like Postman or Insomnia, and make a `POSt` request to the `/estimate-pose` endpoint, with a body with a property name it `file` and selecting an image.
