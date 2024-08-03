@@ -6,7 +6,6 @@ import json
 import mediapipe as mp
 import numpy as np
 
-# from flask import Flask, request, send_file
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -18,8 +17,8 @@ from utils.process_landmarks import process_landmarks
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/estimate-pose", methods=[HttpMethods.POST.value])
-def estimate_pose():
+@app.route("/estimate-pose-image", methods=[HttpMethods.POST.value])
+def estimate_pose_image():
 	"""
 	Endpoint to estimate the pose in an image sent via a POST request.
 
@@ -61,18 +60,16 @@ def estimate_pose():
 
 			coords_and_angles = process_landmarks(landmarks, mp_pose, image)
 
-			# cv2.putText(image, str(int(coords_and_angles["shoulder"]["right"]["angle"])), coords_and_angles["shoulder"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-			# cv2.putText(image, str(int(coords_and_angles["shoulder"]["left"]["angle"])), coords_and_angles["shoulder"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["shoulder"]["right"]["angle"])), coords_and_angles["shoulder"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["shoulder"]["left"]["angle"])), coords_and_angles["shoulder"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
 
-			# cv2.putText(image, str(int(coords_and_angles["elbow"]["right"]["angle"])), coords_and_angles["elbow"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-			# cv2.putText(image, str(int(coords_and_angles["elbow"]["left"]["angle"])), coords_and_angles["elbow"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["elbow"]["right"]["angle"])), coords_and_angles["elbow"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["elbow"]["left"]["angle"])), coords_and_angles["elbow"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
 
-			# cv2.putText(image, str(int(coords_and_angles["wrist"]["right"]["angle"])), coords_and_angles["wrist"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
-			# cv2.putText(image, str(int(coords_and_angles["wrist"]["left"]["angle"])), coords_and_angles["wrist"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["wrist"]["right"]["angle"])), coords_and_angles["wrist"]["right"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
+			cv2.putText(image, str(int(coords_and_angles["wrist"]["left"]["angle"])), coords_and_angles["wrist"]["left"]["coords"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, cv2.LINE_AA)
 
-			# response['landmarks'] = coords_and_angles
-
-	_, processed_image = cv2.imencode('.jpg', image)
+	_, processed_image = cv2.imencode(".jpg", image)
 	processed_image_in_memory = io.BytesIO(processed_image.tobytes())
 
 	# return send_file(processed_image_in_memory, mimetype="image/jpeg", as_attachment=True, download_name=secure_filename(file.filename))
@@ -81,8 +78,25 @@ def estimate_pose():
 
 	# response['image'] = processed_image_base64
 
+	# response = {
+	# 	"angles": coords_and_angles,
+	# 	"image": processed_image_base64
+	# }
 	response = {
-		"angles": coords_and_angles,
+		"angles": {
+			"elbow": {
+				"right": int(coords_and_angles["elbow"]["right"]["angle"]),
+				"left": int(coords_and_angles["elbow"]["left"]["angle"])
+			},
+			"shoulder": {
+				"right": int(coords_and_angles["shoulder"]["right"]["angle"]),
+				"left": int(coords_and_angles["shoulder"]["left"]["angle"])
+			},
+			"wrist": {
+				"right": int(coords_and_angles["wrist"]["right"]["angle"]),
+				"left": int(coords_and_angles["wrist"]["left"]["angle"])
+			}
+		},
 		"image": processed_image_base64
 	}
 

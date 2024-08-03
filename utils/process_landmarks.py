@@ -4,6 +4,7 @@ from .calculate_angle import calculate_angle
 
 
 def process_landmarks(landmarks, mp_pose, image):
+	# Getting values
 	left_shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x, landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
 	right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
 
@@ -19,6 +20,7 @@ def process_landmarks(landmarks, mp_pose, image):
 	left_hip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x, landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
 	right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
 
+	# Getting angles
 	right_shoulder_angle = calculate_angle(right_elbow, right_shoulder, right_hip)
 	left_shoulder_angle = calculate_angle(left_hip, left_shoulder, left_elbow)
 
@@ -28,17 +30,60 @@ def process_landmarks(landmarks, mp_pose, image):
 	right_wrist_angle = calculate_angle(right_pinky, right_wrist, right_elbow)
 	left_wrist_angle = calculate_angle(left_elbow, left_wrist, left_pinky)
 
+	# Getting coords
+	left_elbow_coords = tuple(np.multiply(left_elbow, [image.shape[1], image.shape[0]]).astype(int))
+	right_elbow_coords = tuple(np.multiply(right_elbow, [image.shape[1], image.shape[0]]).astype(int))
+
+	left_shoulder_coords = tuple(np.multiply(left_shoulder, [image.shape[1], image.shape[0]]).astype(int))
+	right_shoulder_coords = tuple(np.multiply(right_shoulder, [image.shape[1], image.shape[0]]).astype(int))
+
+	left_wrist_coords = tuple(np.multiply(left_wrist, [image.shape[1], image.shape[0]]).astype(int))
+	right_wrist_coords = tuple(np.multiply(right_wrist, [image.shape[1], image.shape[0]]).astype(int))
+
 	return {
 		"elbow": {
-			"right": int(right_elbow_angle),
-			"left": int(left_elbow_angle)
+			"right": {
+				"angle": right_elbow_angle,
+				"coords": right_elbow_coords
+			},
+			"left": {
+				"angle": left_elbow_angle,
+				"coords": left_elbow_coords
+			}
 		},
 		"shoulder": {
-			"right": int(right_shoulder_angle),
-			"left": int(left_shoulder_angle)
+			"right": {
+				"angle": right_shoulder_angle,
+				"coords": right_shoulder_coords
+			},
+			"left": {
+				"angle": left_shoulder_angle,
+				"coords": left_shoulder_coords
+			}
 		},
 		"wrist": {
-			"right": int(right_wrist_angle),
-			"left": int(left_wrist_angle)
+			"right": {
+				"angle": right_wrist_angle,
+				"coords": right_wrist_coords
+			},
+			"left": {
+				"angle": left_wrist_angle,
+				"coords": left_wrist_coords
+			}
 		}
 	}
+
+	# return {
+	# 	"elbow": {
+	# 		"right": int(right_elbow_angle),
+	# 		"left": int(left_elbow_angle)
+	# 	},
+	# 	"shoulder": {
+	# 		"right": int(right_shoulder_angle),
+	# 		"left": int(left_shoulder_angle)
+	# 	},
+	# 	"wrist": {
+	# 		"right": int(right_wrist_angle),
+	# 		"left": int(left_wrist_angle)
+	# 	}
+	# }
